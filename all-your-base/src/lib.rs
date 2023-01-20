@@ -46,17 +46,17 @@ pub fn convert(number: &[u32], from_base: u32, to_base: u32) -> Result<Vec<u32>,
         return Err(Error::InvalidDigit(n));
     }
 
-    let mut base = 1u32;
-    let mut number_10base = 0u32;
-    for &digit in number.iter().rev() {
-        number_10base += base * digit;
-        base *= from_base;
-    }
+    let (_, mut number) = number
+        .iter()
+        .rev()
+        .fold((1u32, 0u32), |(base, acc), &digit| {
+            (base * from_base, acc + base * digit)
+        });
 
     let mut result = vec![];
-    while number_10base != 0 {
-        result.insert(0, number_10base % to_base);
-        number_10base = number_10base / to_base;
+    while number != 0 {
+        result.insert(0, number % to_base);
+        number = number / to_base;
     }
 
     if result.len() == 0 {
